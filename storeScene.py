@@ -137,8 +137,8 @@ class DLInformationStore(BaseStore):
             num+=len(pline.pts)-1
         
         writeStr( file , str(num))
-        writeStr( file , '0')                           # material line    
-        writeStr( file , '0')                           # bolt element number
+        writeStr( file , len(dl_database.materialLines))    # material line    
+        writeStr( file , len(dl_database.boltElements))     # bolt element number
         writeStr( file , str(len(dl_database.fixedPoints)))    
         writeStr( file , str(len(dl_database.loadingPoints)))    
         writeStr( file , str(len(dl_database.measuredPoints)))    
@@ -169,6 +169,17 @@ class DLInformationStore(BaseStore):
                 p2 = pts[i+1]
                 writeStr( file , '%f  %f  %f  %f  %d'%(p1[0],p1[1],p2[0],p2[1] , pline.materialNo))
 
+        # material line
+        for line in database.materialLines:
+            p1 = line.startPoint
+            p2 = line.endPoint
+            writeStr( file , '%f  %f  %f  %f  %d'%(p1[0],p1[1],p2[0],p2[1] , line.materialNo))
+            
+        # bolt element
+        for bolt in database.boltElements:
+            p1 = line.startPoint
+            p2 = line.endPoint
+            writeStr( file , '%f  %f  %f  %f  %f  %f  %f'%(p1[0],p1[1],p2[0],p2[1] , line.e0 , line.t0 , line.f0))
             
     def writeJointSetsAndSlope(self , file):
         for joint in self.jointSets:

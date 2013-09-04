@@ -382,6 +382,23 @@ class ParseAndLoadDLData(BaseParseData):
             print 'block  material %d :(%f , %f , %f , %f , %f)'%(i , tmpNums[0] , tmpNums[1] ,tmpNums[2] , tmpNums[3] , materialNo)
             self.__materialLines.append((tmpNums[0] , tmpNums[1] ,tmpNums[2] , tmpNums[3] , materialNo))
         
+        # bolt elements
+        
+        for i in range(self.__boltElementNum):
+            str = self.__fileReader.getNextLine()
+            nums = str.strip().split()
+            for j in range(4):
+                tmpNums[j] = self.parseFloatNum(nums[j], 'bolt element coordinate number')
+                if tmpNums[j] == None :
+                    return False
+            e0 = self.parseFloatNum(nums[4], 'bolt element e0')
+            t0 = self.parseFloatNum(nums[5], 'bolt element t0')
+            f0 = self.parseFloatNum(nums[6], 'bolt element f0')
+            if materialNo == None :
+                return False
+            print 'block  material %d :(%f , %f , %f , %f , %f , %f , %f)'%(i , tmpNums[0] , tmpNums[1] ,tmpNums[2] , tmpNums[3] , e0 , t0 , f0)
+            self.__boltElements.append((tmpNums[0] , tmpNums[1] ,tmpNums[2] , tmpNums[3] , e0 , t0 , f0))
+        
         return True
         
     def __parsePoints(self):
@@ -501,7 +518,7 @@ class ParseAndLoadDLData(BaseParseData):
 
         # bolt element
         database.boltElements = \
-            [DDALine((p[0],p[1],0) , (p[2],p[3],0) , p[4]) for p in self.__boltElements] 
+            [BoltElement((p[0],p[1],0) , (p[2],p[3],0) , p[4] , p[5] , p[6]) for p in self.__boltElements] 
 
         # points
         database.fixedPoints = [DDAPoint(t[0],t[1]) for t in self.__fixedPoints]
@@ -512,305 +529,6 @@ class ParseAndLoadDLData(BaseParseData):
         import Base
         Base.refreshAllShapes()
         
-
-#class ParseDFData(BaseParseData):
-#    def __init__(self):
-#        self.__file = FileReader()
-#        self.refreshBlocksData()
-#        
-#    def refreshBlocksData(self):
-#        self.graph = Graph()
-#        
-#        self.blocksNum = 0
-#        self.blockVerticesNum = 0
-#        self.fixedPointsNum = 0
-#        self.loadingPointsNum = 0
-#        self.measuredPointsNum = 0
-#        self.boltElementsNum = 0
-#        
-#        self.ifDynamic = 0   # 0 :static  1:dynamic
-#        self.stepsNum = 0
-#        self.blockMatsNum = 0
-#        self.jointMatsNum = 0
-#        self.ratio = 0
-#        self.OneSteptimeLimit = 0
-#        self.springStiffness = 0
-#        self.SOR = 0
-#        
-#        self.blockMats = []
-#        self.jointMats = []
-#        self.loadingPoints = []
-#    
-#    def refreshParas(self):
-#        self.ifDynamic = 0   # 0 :static  1:dynamic
-#        self.stepsNum = 0
-#        self.ratio = 0
-#        self.OneSteptimeLimit = 0
-#        self.springStiffness = 0
-#        self.SOR = 0
-#        
-#        self.blockMats = []
-#        self.jointMats = []
-#        self.loadingPoints = []        
-#        
-#    def __parseDataSchema(self , infile):
-#        line = infile.readline()
-#        nums = line.split()
-#        self.blocksNum = self.parseIntNum(nums[0])
-#        self.boltElementsNum = self.parseIntNum(nums[1])
-#        self.blockVerticesNum = self.parseIntNum(nums[2])
-#        
-#        line = infile.readline()
-#        nums = line.split()
-#        self.fixedPointsNum = self.parseIntNum(nums[0])
-#        self.loadingPointsNum = self.parseIntNum(nums[1])
-#        self.measuredPointsNum = self.parseIntNum(nums[2])
-#        
-#        if None in [self.blocksNum , self.boltElementsNum , self.blockVerticesNum \
-#                   , self.fixedPointsNum , self.loadingPointsNum , self.measuredPointsNum]:
-#            return False
-#        print 'DF data : blocks : %d    bolts : %d  vertices : %d fixed Pnts :%d LoadingPnts :%d MeasuredPnts: %d' \
-#            %(self.blocksNum , self.boltElementsNum , self.blockVerticesNum \
-#                   , self.fixedPointsNum , self.loadingPointsNum , self.measuredPointsNum)
-#        return True
-#        
-#    def __parseBlocks(self , infile):
-#        '''
-#        parsing blocks and try to get the maximum material No
-#        :param infile:
-#        '''
-#        for i in range(0 , self.blocksNum):
-#            line = infile.readline()
-#            nums = line.split()
-#            t = int(self.parseFloatNum(nums[0] ,'block No.'))
-#            if t==None or self.parseFloatNum(nums[1])==None or self.parseFloatNum(nums[2])==None: 
-#                return False
-#            if t>self.blockMatsNum : # get max. block material No
-#                self.blockMatsNum = t
-#                
-##            self.blocksInfo.append((self.parseIntNum(nums[1]) , self.parseIntNum(nums[2])))
-#            tmpB = Block()
-#            tmpB.startNo = self.parseIntNum(nums[1])
-#            tmpB.endNo = self.parseIntNum(nums[2])
-#            self.graph.blocks.append(tmpB )
-#            
-##            print line ,
-#            
-#        print 'DF blocks Info done.'
-#                
-#        return True
-#                
-#    def __parseBlockVertices(self,infile):
-#        '''
-#        parsing blocks' vertices and try to get the maximum material No
-#        :param infile:
-#        '''
-#        for i in range(self.blocksNum):
-#            tmpB = self.graph.blocks[i]
-#            for j in range(tmpB.endNo - tmpB.startNo +1): # read blocks vertices 
-#                line = infile.readline()
-#                nums = line.split()
-#                
-#                # get max. blocks' vertices' material No 
-#                t = int(self.parseFloatNum(nums[0] ,'block vertex material No.'))
-#                if t==None or self.parseFloatNum(nums[1])==None or self.parseFloatNum(nums[2])==None: 
-#                    return False
-#                if t>self.jointMatsNum : # get max. block material No
-#                    self.jointMatsNum = t 
-#
-#                tmpB.vertices.append( (self.parseFloatNum(nums[0]) ,self.parseFloatNum(nums[1]) , self.parseFloatNum(nums[2])) )
-#
-#        print 'DF blocks vertices data done.'
-#        return True
-#           
-#    def parse1Point(self  , line , point):
-#        #print line , 
-#        nums = line.split()
-#        point.x = self.parseFloatNum(nums[0])
-#        point.y = self.parseFloatNum(nums[1])
-#        point.blockNo = int(self.parseFloatNum(nums[2]))
-#                
-#    def __parsePoints(self , infile):           
-#        '''
-#        parsing fixed , loading , and measured points 
-#        :param infile:
-#        '''
-#        for i in range(self.fixedPointsNum):
-#            pnt = FixedPoint()
-#            line = infile.readline()
-#            self.parse1Point(line , pnt)            
-#            self.graph.fixedPoints.append(pnt)
-#        print '    fixed points : %d done'%self.fixedPointsNum
-#            
-#        for i in range(self.loadingPointsNum):
-#            pnt = LoadingPoint()
-#            line = infile.readline()
-#            self.parse1Point(line ,  pnt)            
-#            self.graph.loadingPoints.append(pnt)
-#        print '    loading points : %d done'%self.loadingPointsNum
-#        
-#        for i in range(self.measuredPointsNum):
-#            pnt = MeasuredPoint()
-#            line = infile.readline()
-#            self.parse1Point(line , pnt)            
-#            self.graph.measuredPoints.append(pnt)   
-#        print '    measured points : %d done'%self.measuredPointsNum
-#
-#        print 'DF points done.'
-#        return True     
-#         
-#    def parseDFData(self , path):
-#        self.refreshBlocksData()
-#        file = open(path , "rb")
-#        if not self.__parseDataSchema(file) or not self.__parseBlocks(file) or \
-#            not self.__parseBlockVertices(file) or  not self.__parsePoints(file):
-#            return False
-#        
-#        return True
-#    
-#    def __parseParaSchema(self):
-#        '''
-#        parse parameters from DF parameters file
-#        :param infile:
-#        '''
-#
-#        for i in range(7):
-#            line = self.__file.getNextLine()  
-#            t =self.parseFloatNum(line)
-#            if t==None: return False
-#        
-#            if   i==0:     self.ifDynamic = float(t)
-#            elif i==1:     self.stepsNum = int(t)
-#            elif i==2:     self.blockMatsNum = int(t)
-#            elif i==3:     self.jointMatsNum = int(t)
-#            elif i==4:     self.ratio = t
-#            elif i==5:     self.OneSteptimeLimit = int(t)
-#            else:          self.springStiffness = int(t)
-#        
-#        print 'DF Para : IfDynamic: %d  steps: %d  blockMats: %d  JointMats: %d  Ratio: %f  timeInterval: %d  stiffness: %d'\
-#            %(self.ifDynamic, self.stepsNum , self.blockMatsNum , self.jointMatsNum \
-#              , self.ratio, self.OneSteptimeLimit, self.springStiffness)
-#            
-#        print 'Df parameters schema done'
-#        return True
-#    
-#    def __parsePointsParameters(self):
-#        '''
-#        parse parameters for fixed points and loading points
-#        :param infile:
-#        '''
-#        # parse fixed points and loading points' type    0 : fixed points , 2: loading points
-#        # fixed points 
-#        if self.fixedPointsNum>0:
-#            line = self.__file.getNextLine()    
-#            nums = line.split()
-#            for i in nums:
-#                if self.parseIntNum(i)==None :
-#                    return False
-#            print nums
-#        
-#        # loading points
-#        if self.loadingPointsNum>0:
-#            line = self.__file.getNextLine()
-#            nums = line.split()
-#            for i in nums:
-#                if self.parseIntNum(i)==None :
-#                    return False
-#            print nums            
-#            
-#        # parse loading points parameters  (starttime , stressX , stressY  , endtime , stressX , stressY)
-#        for i in range(self.loadingPointsNum):
-#            digits = [1]*6
-#            line1 = self.__file.getNextLine()
-#            nums1 = line1.split()
-#            line2 = self.__file.getNextLine()
-#            nums2 = line2.split()
-#            for j in range(3):
-#                digits[j] = self.parseIntNum(nums1[j])
-#                digits[j+3] = self.parseIntNum(nums2[j])
-#            if None in digits:
-#                return False
-#            self.loadingPoints.append(digits)
-#            
-#            print nums1 , nums2
-#        
-#        print 'fixed points and loading points done.'
-#        
-#        return True
-#            
-#    def __parseBlocksAndJointsPara(self):
-#        '''
-#        parse parameters for blocks and joints'
-#        :param infile:
-#        '''
-#        for i in range(self.blockMatsNum):
-#            digits = [1]*14
-#            line1 = self.__file.getNextLine()
-#            nums1 = line1.split()
-#            for j in range(5):
-#                 digits[j] = self.parseFloatNum(nums1[j])
-#            line2 = self.__file.getNextLine()
-#            nums2 = line2.split()
-#            line3 = self.__file.getNextLine()
-#            nums3 = line3.split()
-#            line4 = self.__file.getNextLine()
-#            nums4 = line4.split()    
-#            for j in range(3):
-#                digits[j+5] = self.parseFloatNum(nums2[j])                    
-#                digits[j+8] = self.parseFloatNum(nums3[j])
-#                digits[j+11] = self.parseFloatNum(nums4[j])
-#            if None in digits:
-#                return False
-#            self.blockMats.append(digits)
-#            print digits
-#            
-#        for i in range(self.jointMatsNum):
-#            digits = [1]*3
-#            line = self.__file.getNextLine()
-#            nums = line.split()
-#            for j in range(3):
-#                digits[j] = self.parseFloatNum(nums[j])
-#            if None in digits:
-#                return False
-#            self.jointMats.append(digits)
-#            print digits
-#            
-#        print 'DF blocks and block vertices\' parameters done.' 
-#        
-#        return True
-#    
-#    def __parseRestPara(self ):
-#        '''
-#        parse SOR and axes
-#        :param infile:
-#        '''
-#        # parse SOR
-#        line = self.__file.getNextLine()
-#        self.SOR = self.parseFloatNum(line)
-#        if self.SOR==None: return False
-#        print 'SOR : ' , self.SOR
-#        
-#        line = self.__file.getNextLine()
-#        nums = line.split()
-#        for i in range(3):
-#            if self.parseFloatNum(nums[i])==None:
-#                return False
-#        print nums
-#            
-#        print 'DF parameters all done.'
-#            
-#        return True
-#    
-#    
-#    def parseDFParameters(self , path):
-#        self.refreshParas()
-#        self.__file.setFile(path)
-#        if not self.__parseParaSchema() or not self.__parsePointsParameters() \
-#            or not self.__parseBlocksAndJointsPara() or not self.__parseRestPara():
-#            return False
-#        
-#        return True
-
 class ParseDFInputParameters(BaseParseData):
     def __init__(self):
         self.__file = None
