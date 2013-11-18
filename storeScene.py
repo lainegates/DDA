@@ -137,8 +137,8 @@ class DLInformationStore(BaseStore):
             num+=len(pline.pts)-1
         
         writeStr( file , str(num))
-        writeStr( file , len(dl_database.materialLines))    # material line    
-        writeStr( file , len(dl_database.boltElements))     # bolt element number
+        writeStr( file , str(len(dl_database.materialLines)))    # material line    
+        writeStr( file , str(len(dl_database.boltElements)))     # bolt element number
         writeStr( file , str(len(dl_database.fixedPoints)))    
         writeStr( file , str(len(dl_database.loadingPoints)))    
         writeStr( file , str(len(dl_database.measuredPoints)))    
@@ -234,13 +234,13 @@ class DLInformationStore(BaseStore):
             
         file.close()
         
-        import Base
-        
-        wholePath = Base.__workbenchPath__ + '\\Ff.c'
-        file = open( wholePath , 'wb' )            #保存文件名
-        file.write(filename)
-        file.close()
-        print 'file save done'
+#        import Base
+#        
+#        wholePath = Base.__workbenchPath__ + '\\Ff.c'
+#        file = open( wholePath , 'wb' )            #保存文件名
+#        file.write(filename)
+#        file.close()
+#        print 'file save done'
         
 class JointLineChangesConfirm(BaseStore):
     '''
@@ -382,10 +382,10 @@ class JointLineChangesConfirm(BaseStore):
             self.storeShape(obj)
             
     def write2File(self):
-        paraFile = open(Base.__workbenchPath__+'/dc_Ff.c', 'wb')
-#        paraFile.write(Base.__currentProjectPath__+'/tmpData.dc')
-        paraFile.write(Base.__currentProjectPath__+'/data.dc')
-        paraFile.close()
+#        paraFile = open(Base.__workbenchPath__+'/dc_Ff.c', 'wb')
+##        paraFile.write(Base.__currentProjectPath__+'/tmpData.dc')
+#        paraFile.write(Base.__currentProjectPath__+'/data.dc')
+#        paraFile.close()
 
 #        outfile = open(Base.__currentProjectPath__+'/tmpData.dc', 'wb')
         outfile = open(Base.__currentProjectPath__+'/data.dc', 'wb')
@@ -442,9 +442,10 @@ class DCInputChangesConfirm(BaseStore):
         self.newFile = []
         self.newFile.extend(self.oldFile[0:2])
 
-        self.newFile.append('%d\n%d\n%d\n%d\n%d\n%d'%(len(df_inputDatabase.materialLines) , 0 \
-                                , len(df_inputDatabase.fixedPoints) , len(df_inputDatabase.loadingPoints) \
-                                , len(df_inputDatabase.measuredPoints) , len(df_inputDatabase.holePoints)))
+        self.newFile.append('%d\n%d\n%d\n%d\n%d\n%d'%(len(df_inputDatabase.materialLines)  \
+                                , len(df_inputDatabase.boltElements), len(df_inputDatabase.fixedPoints) \
+                                , len(df_inputDatabase.loadingPoints) , len(df_inputDatabase.measuredPoints) \
+                                , len(df_inputDatabase.holePoints)))
         
         # lines
         self.__addLines()
@@ -466,10 +467,19 @@ class DCInputChangesConfirm(BaseStore):
     def __addLines(self):
         self.newFile.extend(self.oldFile[8:8+self.jointLinesNum])
         
+        # material lines
         from DDADatabase import df_inputDatabase
         for line in df_inputDatabase.materialLines:
-            self.newFile.append('%f %f %f %f %f'%(line.startPoint[0],line.startPoint[1]\
-                            ,line.endPoint[0],line.endPoint[1],line.materialNo))
+            if line.visible:
+                self.newFile.append('%f %f %f %f %f'%(line.startPoint[0],line.startPoint[1]\
+                                ,line.endPoint[0],line.endPoint[1],line.materialNo))
+        
+        # bolt elements
+        from DDADatabase import df_inputDatabase
+        for line in df_inputDatabase.boltElements:
+            if line.visible:
+                self.newFile.append('%f %f %f %f %f %f %f'%(line.startPoint[0],line.startPoint[1]\
+                                ,line.endPoint[0],line.endPoint[1],line.e0 , line.t0 , line.f0))
         
         
     def __addPoints(self , points):
@@ -480,9 +490,9 @@ class DCInputChangesConfirm(BaseStore):
             self.newFile.append('%f %f'%(p.x,p.y))
         
     def write2File(self):
-        paraFile = open(Base.__workbenchPath__+'/dc_Ff.c', 'wb')
-        paraFile.write(Base.__currentProjectPath__+'/data.dc')
-        paraFile.close()
+#        paraFile = open(Base.__workbenchPath__+'/dc_Ff.c', 'wb')
+#        paraFile.write(Base.__currentProjectPath__+'/data.dc')
+#        paraFile.close()
         
         outfile = open(Base.__currentProjectPath__+'/data.dc', 'wb')
         outfile.write('\n'.join(self.newFile))
@@ -579,7 +589,7 @@ class DFInputGraphDataStore(BaseStore):
         
     def GetResources(self):
         return {
-                'MenuText':  'DC_Store',
+                'MenuText':  'DF_Store',
                 'ToolTip': "store data for dc."}   
              
     def reset(self):

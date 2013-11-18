@@ -1233,6 +1233,8 @@ class ChooseProjectPath:
             print 'change to new project path : ', dir
             import Base
             Base.__currentProjectPath__ = dir
+            import PyDDA
+            PyDDA.setCurrentProjectPath(dir)
 
 
 class SetPanelSize:

@@ -383,7 +383,7 @@ class DFInputDatabase(BaseDatabase):
             self.measuredPoints.extend(args)
         elif shapeType == "HolePoint":
             self.holePoints.extend(args)
-        elif shapeType == 'MaterialLines':
+        elif shapeType == 'MaterialLine':
             self.materialLines.extend(args)
 
     def changeVertices(self , shapeType , idxes , args , ifRecord=False):

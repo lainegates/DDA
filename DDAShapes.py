@@ -156,6 +156,67 @@ class TunnelBoltsGenerator:
         pass
     
 
+class BoltElements( Line ):
+    '''
+    Draw one bolt element every time
+    '''
+    def __init__( self , wiremode = False , shapeType = 'BoltElement' , mustColse=False):
+        Line.__init__( self , wiremode = False , shapeType = shapeType, mustColse= mustColse )
+        
+        
+    def GetResources(self):
+        return {
+                'MenuText':  'AdditionalLine',
+                'ToolTip': "Creates Additional Line of DL."}
+                
+    def Activated(self):
+        Line.Activated(self)
+                
+    def action(self, arg):
+        Line.action(self , arg)
+    
+    def initDialog(self):
+        self.dialog = QtGui.QDialog()
+        layout = QtGui.QVBoxLayout(self.dialog)
+        layout2 = QtGui.QHBoxLayout(self.dialog)
+        self.spinbox = QtGui.QSpinBox(self.dialog)
+        self.spinbox.setRange ( 1, 10 )
+        button = QtGui.QPushButton(self.dialog)
+        button.setText('OK')
+        layout2.addWidget(self.spinbox)
+        layout2.addWidget(button)        
+        label = QtGui.QLabel(self.dialog)
+        label.setText('set material for bolt element :')
+        layout.addWidget(label )
+        layout.addLayout(layout2 )
+        self.dialog.setLayout(layout)
+        QtCore.QObject.connect( button , QtCore.SIGNAL("pressed()"),self.getMaterialNumber)
+        QtCore.QObject.connect( button , QtCore.SIGNAL("pressed()"),self.dialog.accept)
+        
+    def getMaterialNumber(self):
+        return self.spinbox.value()
+        
+    def clearDialog(self):
+        self.dialog = None
+        self.spinbox = None
+                
+    def finish(self , closed=False, ifSave=True , materialNo=1):
+        flag = False
+        if len(self.node)>1 :   # 绘制结束时再弹出选择材质的对话框
+            FreeCAD.Console.PrintError('finishing additional line\n')
+            self.initDialog()
+            self.dialog.exec_()
+            flag = True
+            
+        FreeCAD.Console.PrintError('Additional line finishing\n')
+        if flag:  # 绘制结束时再存入database
+            materialNo = self.getMaterialNumber()
+            obj = Line.finish(self , closed , ifSave=True , materialNo=materialNo)
+            assert obj            
+            self.clearDialog()
+
+
+
 class AdditionalLines( Line ):
     '''
     The DDA Boundary Line definition.

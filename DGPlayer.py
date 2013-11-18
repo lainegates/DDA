@@ -40,7 +40,16 @@ class DGPlayer:
         DDADisplay.clearDocument()
         import Base
         os.chdir(Base.__workbenchPath__)
+        
+        
+#        file = open('dg_ff.c' , 'wb')
+#        file.write(Base.__currentProjectPath__+'/data.dg')
+#        file.close()
+#        
+#        
         import DDAGui
+        print Base.__currentProjectPath__
+        DDAGui.setCurrentProjectPath( Base.__currentProjectPath__)
         FreeCADGui.runCommand("DDA_Test")  # it is in DDAGui.pyd
         os.chdir(path)
 

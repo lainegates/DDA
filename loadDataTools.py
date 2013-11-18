@@ -719,7 +719,8 @@ class ParseDFInputGraphData(BaseParseData):
         
         file = open(path , "rb")
         if not self.__parseDataSchema(file) or not self.__parseBlocks(file) or \
-            not self.__parseBlockVertices(file) or  not self.__parsePoints(file):
+            not self.__parseBlockVertices(file) or  not self.__parseBoltElements(file) \
+            or not self.__parsePoints(file):
             Base.showErrorMessageBox("DataError", 'Data input unvalid')
             return False
         
@@ -799,6 +800,8 @@ class ParseDFInputGraphData(BaseParseData):
         df_inputDatabase.jointMatCollections =set()
         jointMatCollection = df_inputDatabase.jointMatCollections
         
+        ptsBounds = range(4)
+        
         for i in range(self.blocksNum):
             tmpB = self.graph.blocks[i]
             for j in range(int(tmpB.endNo) - int(tmpB.startNo) +1): # read blocks vertices 
@@ -815,6 +818,16 @@ class ParseDFInputGraphData(BaseParseData):
                 tmpB.vertices.append( (t0,t1,t2) )
                 jointMatCollection.add(t0)
                 
+                # get vertices' value boundary
+                if i==0:
+                    ptsBounds[0]=ptsBounds[1] = t1
+                    ptsBounds[2]=ptsBounds[2] = t2
+                else:
+                    if t1<ptsBounds[0]: ptsBounds[0]=t1
+                    elif t1>ptsBounds[1]: ptsBounds[1]=t1
+                    elif t2<ptsBounds[2]: ptsBounds[2]=t2
+                    elif t2>ptsBounds[3]: ptsBounds[3]=t2
+                
             for i in range(4): # block parameters
                 line = infile.readline()
 #                print line
@@ -826,9 +839,23 @@ class ParseDFInputGraphData(BaseParseData):
                     return False
                 
                 tmpB.parameters.extend([t0,t1,t2])
+                
+        import Base
+        margin = ptsBounds[1]-ptsBounds[0]
+        if margin > (ptsBounds[3]-ptsBounds[2]):
+            margin = ptsBounds[3]-ptsBounds[2]
+        Base.__radius4Points__ = margin/60
 
         print 'DF blocks vertices data done.'
         return True
+
+    def __parseBoltElements(self , infile):
+        for i in range(self.boltElementsNum):
+            for j in range(3):
+                line = infile.readline()
+        print '    %d bolt elements parsed done'%self.boltElementsNum
+        return True
+        
 
     def parse1Point(self  , line , point):
         #print line , 
@@ -871,6 +898,7 @@ class ParseAndLoadDCInputData(BaseParseData):
     def __init__(self):
         self.reset()
         self.__fileReader = FileReader()
+        self.database = None
         
     def GetResources(self):
         return {
@@ -900,7 +928,7 @@ class ParseAndLoadDCInputData(BaseParseData):
         self.holePointsNum = 0
     
     def __ParsePandect(self):
-        from DDADatabase import dc_inputDatabase
+#        from DDADatabase import dc_inputDatabase
         
         self.__fileReader.getNextLine()   # minimum edge length e0
         
@@ -908,7 +936,7 @@ class ParseAndLoadDCInputData(BaseParseData):
         self.jointLinesNum = self.parseIntNum(nums[0])
         
         # temperary code, I will try to revise this if I fully understand the data.dc 
-        dc_inputDatabase.boundaryLinesNum = self.parseIntNum(nums[1])
+        self.database.boundaryLinesNum = self.parseIntNum(nums[1])
         
         nums = self.__fileReader.getNextLine()
         self.materialLinesNum = self.parseIntNum(nums)
@@ -929,33 +957,48 @@ class ParseAndLoadDCInputData(BaseParseData):
         self.holePointsNum = self.parseIntNum(nums)
         
     def __parseLines(self):
-        from DDADatabase import dc_inputDatabase
+#        from DDADatabase import dc_inputDatabase
         # joint lines
-        dc_inputDatabase.jointLines = []
+        self.database.jointLines = []
         for i in range(self.jointLinesNum):
             nums = self.__fileReader.getNextLine().split()
             jointMaterial = int(self.parseFloatNum(nums[4]))
             p1 = ( self.parseFloatNum(nums[0]) , self.parseFloatNum(nums[1]) , 0 ) 
             p2 = ( self.parseFloatNum(nums[2]) , self.parseFloatNum(nums[3]) , 0 )
-            dc_inputDatabase.jointLines.append(DDALine(p1 , p2 , jointMaterial))
+            self.database.jointLines.append(DDALine(p1 , p2 , jointMaterial))
             
         # material lines
-        dc_inputDatabase.materialLines = []
+        self.database.materialLines = []
         for i in range(self.materialLinesNum):
             self.__fileReader.getNextLine()
             
             
         # bolt elements
-        pass
+        tmpNums = range(4)
+        self.database.boltElements = []
+        for i in range(self.boltElementsNum):
+            nums = self.__fileReader.getNextLine().split()
+            for j in range(4):
+                tmpNums[j] = self.parseFloatNum(nums[j], 'bolt element coordinate number')
+                if tmpNums[j] == None :
+                    return False
+            e0 = self.parseFloatNum(nums[4], 'bolt element e0')
+            t0 = self.parseFloatNum(nums[5], 'bolt element t0')
+            f0 = self.parseFloatNum(nums[6], 'bolt element f0')
+            if e0==None or t0==None or f0==None :
+                return False
+            print 'block  material %d :(%f , %f , %f , %f , %f , %f , %f)'%(i , tmpNums[0] , tmpNums[1] ,tmpNums[2] , tmpNums[3] , e0 , t0 , f0)
+            self.database.boltElements.append(BoltElement(tmpNums[0] , tmpNums[1] ,tmpNums[2] , tmpNums[3] , e0 , t0 , f0))
+
         
     def __parsePoints(self):
-        from DDADatabase import dc_inputDatabase
+#        from DDADatabase import dc_inputDatabase
         import Base
         # fixed points
         windowInfo = [0 , 0 , 0 , 0]
         nums = self.__fileReader.getNextLine().split()
         p = (self.parseFloatNum(nums[0]) , self.parseFloatNum(nums[1]) , 0)
-        dc_inputDatabase.fixedPoints.append( FixedPoint(p[0] , p[1]))
+        self.database.fixedPoints.append( FixedPoint(p[0] , p[1]))
         windowInfo[0] = windowInfo[1] = p[0]
         windowInfo[2] = windowInfo[3] = p[1]
         for i in range(self.fixedPointsNum-1):
@@ -965,7 +1008,7 @@ class ParseAndLoadDCInputData(BaseParseData):
             if p[0]>windowInfo[1]:windowInfo[1] = p[0]
             if p[1]<windowInfo[2]:windowInfo[2] = p[1]
             if p[1]>windowInfo[3]:windowInfo[3] = p[1]
-            dc_inputDatabase.fixedPoints.append( FixedPoint(p[0] , p[1]))
+            self.database.fixedPoints.append( FixedPoint(p[0] , p[1]))
             
         Base.__radius4Points__ = (windowInfo[1] - windowInfo[0]) * 0.01
         Base.__windowInfo__ = windowInfo
@@ -973,17 +1016,17 @@ class ParseAndLoadDCInputData(BaseParseData):
         # loading points
         for i in range(self.loadingPointsNum):
             nums = self.__fileReader.getNextLine().split()
-            dc_inputDatabase.loadingPoints.append( \
+            self.database.loadingPoints.append( \
                 LoadingPoint(self.parseFloatNum(nums[0]) , self.parseFloatNum(nums[1])))
         # measured points
         for i in range(self.measuredPointsNum):
             nums = self.__fileReader.getNextLine().split()
-            dc_inputDatabase.measuredPoints.append( \
+            self.database.measuredPoints.append( \
                 MeasuredPoint(self.parseFloatNum(nums[0]) , self.parseFloatNum(nums[1])))
         # hole points
         for i in range(self.holePointsNum):
             nums = self.__fileReader.getNextLine().split()
-            dc_inputDatabase.holePoints.append( \
+            self.database.holePoints.append( \
                 HolePoint(self.parseFloatNum(nums[0]) , self.parseFloatNum(nums[1])))        
         
     def parse(self):
@@ -992,11 +1035,15 @@ class ParseAndLoadDCInputData(BaseParseData):
         print 'try to read DC data from file : ' , filename
 #        filename = Base.__currentProjectPath__ + '/tmpData.dc'
         self.__fileReader.setFile(filename)
+        import DDADatabase
+        self.database = DDADatabase.DCInputDatabase()
         self.reset()
         self.__ParsePandect()
         self.__parseLines()
         self.__parsePoints()
         self.__fileReader.closeFile()
+        DDADatabase.dc_inputDatabase = self.database
+        self.database = None
     
 
 class DDALoadData():
