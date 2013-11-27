@@ -37,8 +37,6 @@ import PartGui
 # General functions
 #---------------------------------------------------------------------------
 
-#__currentProjectPath__ = r'D:/DDAProject'
-#__workbenchPath__ = r'D:/Program Files (x86)/FreeCAD0.13/Mod/DDA'
 __currentProjectPath__ = None
 __workbenchPath__ = None
 __radius4boltEndpoint__ = 0.01

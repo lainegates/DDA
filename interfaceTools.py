@@ -355,16 +355,56 @@ class BorderCalculator:
 #
 ####################################################
 
-class Tunnel2BoltsGenerator:
+class TunnelBoltsGenerator:
     @staticmethod
-    def generateBolts(centerX , centerY , halfWidth , halfHeight \
-                      , arcRadius , boltsDistance , boltLength , boltLength2 ):
+    def generateBolts4Tunnel1(centerX , centerY , hAxesLength , vAxesLength \
+                      , boltLength , boltLength2 , boltsDistance ):
         import DDACalcTools
         bolts = DDACalcTools.pyBolts()
         print bolts.size()
-        DDACalcTools.calcBolts4Type2Tunnel( centerX , centerY , halfWidth, halfHeight \
-            , arcRadius , boltLength , boltLength2 , boltsDistance , bolts)
+#        DDACalcTools.calcBolts4Type2Tunnel( float(centerX) , float(centerY) , float(hAxesLength) \
+#              , float(vAxesLength) , float(boltLength) , float(boltLength2) , float(boltsDistance) , bolts)
+        DDACalcTools.calcBolts4Type1Tunnel( centerX , centerY , hAxesLength \
+              , vAxesLength , boltLength , boltLength2 , boltsDistance , bolts)
         
+        return TunnelBoltsGenerator._convert2BoltElements(bolts)
+        
+    @staticmethod
+    def generateBolts4Tunnel2(centerX , centerY , halfWidth , halfHeight \
+                      , arcHeight , boltLength , boltLength2 , boltsDistance ):
+        import DDACalcTools
+        bolts = DDACalcTools.pyBolts()
+        print bolts.size()
+        DDACalcTools.calcBolts4Type2Tunnel( float(centerX) , float(centerY) , float(halfWidth), float(halfHeight) \
+            , float(arcHeight) , float(boltLength) , float(boltLength2) , float(boltsDistance) , bolts)
+        
+        return TunnelBoltsGenerator._convert2BoltElements(bolts)
+        
+    @staticmethod
+    def generateBolts4Tunnel3(centerX , centerY , hAxesLength , vAxesLength \
+                      , cornerHeight , boltLength , boltLength2 , boltsDistance ):
+        import DDACalcTools
+        bolts = DDACalcTools.pyBolts()
+        print bolts.size()
+        DDACalcTools.calcBolts4Type3Tunnel( float(centerX) , float(centerY) , float(hAxesLength) , float(vAxesLength) \
+            , float(cornerHeight) , float(boltLength) , float(boltLength2) , float(boltsDistance) , bolts)
+        
+        return TunnelBoltsGenerator._convert2BoltElements(bolts)
+        
+    @staticmethod
+    def generateBolts4Tunnel4(centerX , centerY , radius , cornerHeight \
+                      , ifRotate , boltLength , boltLength2 , boltsDistance ):
+        import DDACalcTools
+        bolts = DDACalcTools.pyBolts()
+        print bolts.size()
+        DDACalcTools.calcBolts4Type4Tunnel( float(centerX) , float(centerY) , float(radius), float(cornerHeight) \
+            , float(ifRotate) , float(boltLength) , float(boltLength2) , float(boltsDistance) , bolts)
+        
+        return TunnelBoltsGenerator._convert2BoltElements(bolts)
+        
+        
+    @staticmethod
+    def _convert2BoltElements( bolts):
         from loadDataTools import BoltElement
         resultBolts=[]
         for bolt in bolts:

@@ -1069,7 +1069,8 @@ class DataTable(QtCore.QObject):
 
 class TunnelSelectionTool(QtGui.QDialog):
     '''
-    tools to choose tunnel
+    This class is a tools to help users to choose the tunnel they want to generate bolts for
+    The tunnel parameters from 'data.dl'
     '''
     def __init__(self,parent=None):
         QtGui.QDialog.__init__(self,parent)
@@ -1087,7 +1088,18 @@ class TunnelSelectionTool(QtGui.QDialog):
         import DDADatabase
         database = DDADatabase.dl_database
         tunnels = database.tunnels
-        if len(tunnels)==0: return None
+        if len(tunnels)==0:
+            FreeCADGui.runCommand('DDA_LoadDLInputData') 
+            Base.changeStep4Stage('SpecialStep')
+            
+        database = DDADatabase.dl_database
+        tunnels = database.tunnels
+        if len(tunnels)==0:
+            from Base import showErrorMessageBox
+            showErrorMessageBox( 'DataNotFound' 
+                , 'No tunnel data found in file \"%s/data.dl\".'%Base.__currentProjectPath__ )
+            return
+
 
         table = self.ui.tableWidget
         table.setRowCount(len(tunnels))
@@ -1100,13 +1112,84 @@ class TunnelSelectionTool(QtGui.QDialog):
         flag = self.exec_()
         if QtGui.QDialog.Accepted==flag:
             return table.currentRow()
-        return None
         
     def getSelectedTunnelNo(self):
         if self.ui.tableWidget.rowCount()>0:
             return self.ui.tableWidget.currentRow()
 
+class CalculateTunnelBoltsWithParameters(QtGui.QDialog):
+    '''
+    calculate bolts elements with parameters that users set.
+    '''
+    def __init__(self,parent=None):
+        QtGui.QDialog.__init__(self,parent)
+        self.initUI()
+        self.bolts = []
+        self.tunnel = None
+        
+    def initUI(self):
+        import ui_BoltsParameters
+        self.ui = ui_BoltsParameters.Ui_Dialog()
+        self.ui.setupUi(self)
+        self.ui.buttonBox.accepted.connect(self.accept)
+        
+    def calculateBolts4Tunnel(self, tunnel):
+        self.tunnel = tunnel
+        
+    def _realCalc(self):
+        assert self.tunnel
+        from interfaceTools import TunnelBoltsGenerator
+        t = self.tunnel
+        if(t[0]==1):
+            self.bolts = TunnelBoltsGenerator.generateBolts4Tunnel1(centerX=t[5]
+                , centerY=t[6], hAxesLength=t[1], vAxesLength=t[2]
+                , boltLength=self.ui.spinBox_length1.value() 
+                , boltLength2=self.ui.spinBox_length2.value()
+                , boltsDistance=self.ui.spinBox_boltDistance.value())
+        elif(t[0]==2):
+            self.bolts = TunnelBoltsGenerator.generateBolts4Tunnel2(centerX=t[5]
+                , centerY=t[6], halfWidth=t[1], halfHeight=t[2]
+                , arcHeight=t[3], boltLength=self.ui.spinBox_length1.value()
+                , boltLength2=self.ui.spinBox_length1.value()
+                , boltsDistance=self.ui.spinBox_boltDistance.value())
+        elif(t[0]==3):
+            self.bolts = TunnelBoltsGenerator.generateBolts4Tunnel3(centerX=t[5]
+                , centerY=t[6], hAxesLength=t[1], vAxesLength=t[2]
+                , cornerHeight=t[3], boltLength=self.ui.spinBox_length1.value() 
+                , boltLength2=self.ui.spinBox_length2.value()
+                , boltsDistance=self.ui.spinBox_boltDistance.value())
+        elif(t[0]==4):
+            self.bolts = TunnelBoltsGenerator.generateBolts4Tunnel4(centerX=t[5]
+                , centerY=t[6], radius=t[1], cornerHeight=t[3]
+                , ifRotate=t[4], boltLength=self.ui.spinBox_length1.value() 
+                , boltLength2=self.ui.spinBox_length2.value()
+                , boltsDistance=self.ui.spinBox_boltDistance.value())
+            
+        import DDADatabase
+        DDADatabase.tmpBoltElements = self.bolts
+            
+    def accept(self):
+        import DDADatabase , Base
+        self._realCalc()
+        Base.addLines2Document(shapeType = 'BoltElement', ifStore2Database=True
+                               , args=DDADatabase.tmpBoltElements)
+        QtGui.QDialog.accept(self)
+
+#    def done(self , r):
+#        print '''************************************\n
+#                ************************************\n
+#                ************************************\n
+#                ************************************\n
+#                ************************************\n'''
+#        QtGui.QDialog.done(self , r)
+#        import DDADatabase , Part
+#        DDADatabase.tmpBoltElements = []
+#        FreeCAD.ActiveDocument.getObject('TmpBoltElement').Shape=Part.Shape()
+
 class TunnelBoltsSelectionTool(QtGui.QDialog):
+    '''
+    This class is designed to help users to select the bolts they want on the screen
+    '''
     def __init__(self,parent=None):
         QtGui.QDialog.__init__(self,parent)
         self.initUI()
@@ -1133,9 +1216,9 @@ class TunnelBoltsSelectionTool(QtGui.QDialog):
         print 'generate bolt elements for Tunnel (%f ,  %f , %f , %f , %f ,%f , %f)' \
                 %( a , b , c , centerX , centerY , length , length2 )
         
-        from interfaceTools import Tunnel2BoltsGenerator
+        from interfaceTools import TunnelBoltsGenerator
         
-        self.bolts = Tunnel2BoltsGenerator.generateBolts( centerX=centerX , centerY=centerY \
+        self.bolts = TunnelBoltsGenerator.generateBolts( centerX=centerX , centerY=centerY \
             , halfWidth=a , halfHeight=b , arcRadius=c \
             , boltsDistance=1 , boltLength=length , boltLength2=length2)
         

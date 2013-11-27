@@ -263,7 +263,7 @@ class DCCMD :
         self.ui.addAction(self.act_MeasuredPoint)
         self.ui.addAction(self.act_HolePoint)
         self.ui.addAction(self.act_MaterialLine)
-#        self.ui.addAction(self.act_GenerateBolts) 
+        self.ui.addAction(self.act_GenerateBolts) 
         self.ui.addSeparator()
 #        self.ui.addAction(self.act_Preview)
         self.ui.addAction(self.act_Calculate)

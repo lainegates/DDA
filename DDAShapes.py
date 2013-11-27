@@ -122,31 +122,48 @@ class TunnelBoltsGenerator:
                 'ToolTip': "generate bolts for tunnel."}
 
     def Activated(self):
-        from interfaceTools import Tunnel2BoltsGenerator
+        from interfaceTools import TunnelBoltsGenerator
 
-#        ---------------test code--------------
-#        from DDADatabase import dl_database
-#        tunnels = dl_database.tunnels
-#        
-#        assert tunnels
-#        t = tunnels[0]
-#        bolts = Tunnel2BoltsGenerator.generateBolts( centerX=t[5] , centerY=t[6] \
-#            , halfWidth=t[1] , halfHeight=t[2] , arcRadius=t[3] \
-#            , boltsDistance=1 , boltLength=12 , boltLength2=10)
-#        
+#        bolts = TunnelBoltsGenerator.generateBolts4Tunnel1( centerX=20.0 , centerY=50.0 
+#                      , hAxesLength=10.0 , vAxesLength=8.0 \
+#                      , boltLength=4.0 , boltLength2=6.0 , boltsDistance=5.0)
+#        bolts2 = TunnelBoltsGenerator.generateBolts4Tunnel2( centerX=40 , centerY=50 \
+#            , halfWidth=8 , halfHeight=6 , arcHeight=12 \
+#            , boltLength=5 , boltLength2=7 , boltsDistance=4 )
+#        bolts3 = TunnelBoltsGenerator.generateBolts4Tunnel3(centerX=80 , centerY=50 \
+#                      , hAxesLength=8 , vAxesLength=9 \
+#                      , cornerHeight=4 , boltLength=5 , boltLength2=4 , boltsDistance=2)
+#        bolts4 = TunnelBoltsGenerator.generateBolts4Tunnel4( centerX=120 , centerY=50 \
+#                      , radius=15 , cornerHeight=6 \
+#                      , ifRotate=0 , boltLength=5 , boltLength2=7 , boltsDistance=4)
+        
 #        import Base
 #        Base.addLines2Document(shapeType = 'BoltElement', ifStore2Database=True, args=bolts)
+#        print len(bolts)
+#        import Base
+#        Base.addLines2Document(shapeType = 'BoltElement', ifStore2Database=True, args=bolts2)
+#        import Base
+#        Base.addLines2Document(shapeType = 'BoltElement', ifStore2Database=True, args=bolts3)
+#        import Base
+#        Base.addLines2Document(shapeType = 'BoltElement', ifStore2Database=True, args=bolts4)
 
-        box = QtGui.QMessageBox( QtGui.QMessageBox.Information , 'Information' \
-                         , 'The function to generate bolts for tunnel is available. But now the core calculation module which could calculate is testing. The funcion will come soon. Sorry for this.' , QtGui.QMessageBox.Ok) 
-        box.exec_()
+#        box = QtGui.QMessageBox( QtGui.QMessageBox.Information , 'Information' \
+#                         , 'The function to generate bolts for tunnel is available. But now the core calculation module which could calculate is testing. The funcion will come soon. Sorry for this.' , QtGui.QMessageBox.Ok) 
+#        box.exec_()
+#        
+
+        from DDATools import TunnelSelectionTool , CalculateTunnelBoltsWithParameters
+        dialog = TunnelSelectionTool()
+        idx = dialog.select()
+        if idx!=0 and idx==None:
+            return
+        else:
+            calculator = CalculateTunnelBoltsWithParameters()
+            from DDADatabase import dl_database
+            calculator.calculateBolts4Tunnel(dl_database.tunnels[idx])
+            calculator.exec_()
         
-
-#        from DDATools import TunnelSelectionTool , TunnelBoltsSelectionTool
-#        dialog = TunnelSelectionTool()
-#        idx = dialog.select()
-#        if idx==None:
-#            return
+        
 #        
 #        boltsDialog = TunnelBoltsSelectionTool()
 #        boltsDialog.configure(idx)

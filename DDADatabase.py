@@ -279,6 +279,7 @@ class DCInputDatabase(BaseDatabase):
         self.boundaryLinesNum = 0 # special number, currently I don't fully understand it in data.dc, I will learn it later 
         self.additionalLines = []
         self.jointLines = []
+        self.boltElements = []
         self.materialLines = []
         self.fixedPoints = []
         self.loadingPoints = []
@@ -295,6 +296,8 @@ class DCInputDatabase(BaseDatabase):
   
         if shapeType == "AdditionalLine":
             self.additionalLines.extend(args)
+        elif shapeType == "BoltElement":
+            self.boltElements.extend(args)
         elif shapeType == "FixedPoint":
             self.fixedPoints.extend(args)
         elif shapeType == "LoadingPoint":
@@ -375,7 +378,9 @@ class DFInputDatabase(BaseDatabase):
         
         from loadDataTools import DDAPolyLine , FixedPoint , MeasuredPoint , LoadingPoint , Graph , HolePoint
   
-        if shapeType == "FixedPoint":
+        if shapeType == "BoltElement":
+            self.boltElements.extend(args)
+        elif shapeType == "FixedPoint":
             self.fixedPoints.extend(args)
         elif shapeType == "LoadingPoint":
             self.loadingPoints.extend(args)

@@ -242,155 +242,155 @@ class DLInformationStore(BaseStore):
 #        file.close()
 #        print 'file save done'
         
-class JointLineChangesConfirm(BaseStore):
-    '''
-    对应于ParseAndLoadDCInputData 使用，这类要保存的数据都在 dc_inputDatabase 中
-    '''
-    def __init__(self):
-        self.newFile = []
-        
-        self.materialLines = []
-        
-    def GetResources(self):
-        return {
-                'MenuText':  'Confirm',
-                'ToolTip': "confirm the data changes."}   
-        
-    def storeScene(self):
-        self.collectShapes()
-        self.organizeContent()
-        self.write2File()
-
-        
-    def storeShape( self , obj):
-        type = self.getRealType(obj)
-        print type
-        if type == 'MaterialLine':
-            self.materialLines.append(obj)
-
-        
-    def organizeContent(self):
-        '''
-        organize content that will be writen into file.
-        self.oldFile is original file
-        self.newFile is the new file
-        '''
-        file = open(Base.__currentProjectPath__+'/data.dc','rb')
-        self.oldFile = file.read(-1).split('\n')
-        for i,line in enumerate(self.oldFile):
-            self.oldFile[i]=line.strip()
-        file.close()
-        
-        from DDADatabase import dc_inputDatabase        
-        # schema
-        nums = self.oldFile[1].split()
-        self.jointLinesNum = int(nums[0])
-        self.BoundaryLinesNum = int(nums[1])
-        
-        self.newFile = []
-        self.newFile.extend(self.oldFile[0:2])
-        
-        self.newFile.append('%d\n%d\n%d\n%d\n%d\n%d'%(len(dc_inputDatabase.materialLines) , 0 \
-                                , len(dc_inputDatabase.fixedPoints) , len(dc_inputDatabase.loadingPoints) \
-                                , len(dc_inputDatabase.measuredPoints) , len(dc_inputDatabase.holePoints)))
-        
-        # lines
-        self.__addLines()
-        
-        # points
-        for p in dc_inputDatabase.fixedPoints:
-            self.newFile.append('%f %f %f %f'%(p[0],p[1] , p[0],p[1]))        
-        
-        self.__addPoints(dc_inputDatabase.loadingPoints)
-        self.__addPoints(dc_inputDatabase.measuredPoints)
-        self.__addPoints(dc_inputDatabase.holePoints)
-        
-        if len(dc_inputDatabase.holePoints)>0:
-            self.newFile.append('0')
-        else:
-            self.newFile.append('0\n0 0')
-        
-    def __applyJointLinesChanges(self):
-        from DDADatabase import dc_inputDatabase
-        
-        jointLinesChanges = []
-        for i in range(len(dc_inputDatabase.jointLines)):
-            jointLinesChanges.append([])
-            
-        for item in dc_inputDatabase.jointLinesChanges.items():
-            # item --> refer to DCInputDatabase.__init__()
-            jointSetNo = item[0][0]+1
-            subElementNo = item[0][1]-1
-            if item[1][0]!='D': # key is not 'Delete'
-                dc_inputDatabase.jointLines[jointSetNo][subElementNo*2] = item[1][0]
-                dc_inputDatabase.jointLines[jointSetNo][subElementNo*2+1] = item[1][1]
-            else: # 'Delete'
-                jointLinesChanges[jointSetNo].append(subElementNo)
-                
-        for i in range(len(jointLinesChanges)):
-            jointLinesChanges[i].sort(reverse = True)
-            
-        for i in range(len(jointLinesChanges)):
-            for j in range(len(jointLinesChanges[i])):
-                del dc_inputDatabase.jointLines[i][2*j+1]  # 删除顺序不能错
-                del dc_inputDatabase.jointLines[i][2*j]
-            
-        
-    def __addLines(self):
-        from DDADatabase import dc_inputDatabase
-        
-        # write joint lines
-        self.__applyJointLinesChanges()
-        nums = 0        
-        for materialNo , pts in enumerate(dc_inputDatabase.jointLines):
-            if pts==None:
-                continue
-            t = len(pts)/2
-            nums+=t
-            for i in range(t):
-                p1 = pts[2*i]
-                p2 = pts[2*i+1]
-                self.newFile.append('%f  %f  %f  %f  %f'%(p1[0],p1[1],p2[0],p2[1],materialNo))
-                
-        # update self.jointLinesNum
-        self.jointLinesNum = nums
-        tmpN = self.newFile[1].split()
-        self.newFile[1] = '%d %s'%(self.jointLinesNum, tmpN[1])
-        
-        # material lines
-        for line in self.materialLines:
-            start = line.ViewObject.StartPoint
-            end = line.ViewObject.EndPoint
-            self.newFile.append('%f %f %f %f %f'%(start[0],start[1],end[0],end[1],line.ViewObject.Material))
-        
-                
-    def __addPoints(self , points):
-        '''
-        add points to self.newFile
-        '''
-        for p in points:
-            self.newFile.append('%f %f'%(p[0],p[1]))
-            
-    def reset(self):
-        self.materialLines = []
-            
-    def collectShapes(self):
-        self.reset()
-        doc = FreeCAD.ActiveDocument   #  获取当前活动视图
-        objs = doc.Objects             #  获取当前对象列表，有时效性，如获得后列表更新，这个已获得不会改变
-        for obj in objs :
-            self.storeShape(obj)
-            
-    def write2File(self):
-#        paraFile = open(Base.__workbenchPath__+'/dc_Ff.c', 'wb')
-##        paraFile.write(Base.__currentProjectPath__+'/tmpData.dc')
-#        paraFile.write(Base.__currentProjectPath__+'/data.dc')
-#        paraFile.close()
-
-#        outfile = open(Base.__currentProjectPath__+'/tmpData.dc', 'wb')
-        outfile = open(Base.__currentProjectPath__+'/data.dc', 'wb')
-        outfile.write('\n'.join(self.newFile))
-        outfile.close()
+#class JointLineChangesConfirm(BaseStore):
+#    '''
+#    对应于ParseAndLoadDCInputData 使用，这类要保存的数据都在 dc_inputDatabase 中
+#    '''
+#    def __init__(self):
+#        self.newFile = []
+#        
+#        self.materialLines = []
+#        
+#    def GetResources(self):
+#        return {
+#                'MenuText':  'Confirm',
+#                'ToolTip': "confirm the data changes."}   
+#        
+#    def storeScene(self):
+#        self.collectShapes()
+#        self.organizeContent()
+#        self.write2File()
+#
+#        
+#    def storeShape( self , obj):
+#        type = self.getRealType(obj)
+#        print type
+#        if type == 'MaterialLine':
+#            self.materialLines.append(obj)
+#
+#        
+#    def organizeContent(self):
+#        '''
+#        organize content that will be writen into file.
+#        self.oldFile is original file
+#        self.newFile is the new file
+#        '''
+#        file = open(Base.__currentProjectPath__+'/data.dc','rb')
+#        self.oldFile = file.read(-1).split('\n')
+#        for i,line in enumerate(self.oldFile):
+#            self.oldFile[i]=line.strip()
+#        file.close()
+#        
+#        from DDADatabase import dc_inputDatabase        
+#        # schema
+#        nums = self.oldFile[1].split()
+#        self.jointLinesNum = int(nums[0])
+#        self.BoundaryLinesNum = int(nums[1])
+#        
+#        self.newFile = []
+#        self.newFile.extend(self.oldFile[0:2])
+#        
+#        self.newFile.append('%d\n%d\n%d\n%d\n%d\n%d'%(len(dc_inputDatabase.materialLines) , 0 \
+#                                , len(dc_inputDatabase.fixedPoints) , len(dc_inputDatabase.loadingPoints) \
+#                                , len(dc_inputDatabase.measuredPoints) , len(dc_inputDatabase.holePoints)))
+#        
+#        # lines
+#        self.__addLines()
+#        
+#        # points
+#        for p in dc_inputDatabase.fixedPoints:
+#            self.newFile.append('%f %f %f %f'%(p[0],p[1] , p[0],p[1]))        
+#        
+#        self.__addPoints(dc_inputDatabase.loadingPoints)
+#        self.__addPoints(dc_inputDatabase.measuredPoints)
+#        self.__addPoints(dc_inputDatabase.holePoints)
+#        
+#        if len(dc_inputDatabase.holePoints)>0:
+#            self.newFile.append('0')
+#        else:
+#            self.newFile.append('0\n0 0')
+#        
+#    def __applyJointLinesChanges(self):
+#        from DDADatabase import dc_inputDatabase
+#        
+#        jointLinesChanges = []
+#        for i in range(len(dc_inputDatabase.jointLines)):
+#            jointLinesChanges.append([])
+#            
+#        for item in dc_inputDatabase.jointLinesChanges.items():
+#            # item --> refer to DCInputDatabase.__init__()
+#            jointSetNo = item[0][0]+1
+#            subElementNo = item[0][1]-1
+#            if item[1][0]!='D': # key is not 'Delete'
+#                dc_inputDatabase.jointLines[jointSetNo][subElementNo*2] = item[1][0]
+#                dc_inputDatabase.jointLines[jointSetNo][subElementNo*2+1] = item[1][1]
+#            else: # 'Delete'
+#                jointLinesChanges[jointSetNo].append(subElementNo)
+#                
+#        for i in range(len(jointLinesChanges)):
+#            jointLinesChanges[i].sort(reverse = True)
+#            
+#        for i in range(len(jointLinesChanges)):
+#            for j in range(len(jointLinesChanges[i])):
+#                del dc_inputDatabase.jointLines[i][2*j+1]  # 删除顺序不能错
+#                del dc_inputDatabase.jointLines[i][2*j]
+#            
+#        
+#    def __addLines(self):
+#        from DDADatabase import dc_inputDatabase
+#        
+#        # write joint lines
+#        self.__applyJointLinesChanges()
+#        nums = 0        
+#        for materialNo , pts in enumerate(dc_inputDatabase.jointLines):
+#            if pts==None:
+#                continue
+#            t = len(pts)/2
+#            nums+=t
+#            for i in range(t):
+#                p1 = pts[2*i]
+#                p2 = pts[2*i+1]
+#                self.newFile.append('%f  %f  %f  %f  %f'%(p1[0],p1[1],p2[0],p2[1],materialNo))
+#                
+#        # update self.jointLinesNum
+#        self.jointLinesNum = nums
+#        tmpN = self.newFile[1].split()
+#        self.newFile[1] = '%d %s'%(self.jointLinesNum, tmpN[1])
+#        
+#        # material lines
+#        for line in self.materialLines:
+#            start = line.ViewObject.StartPoint
+#            end = line.ViewObject.EndPoint
+#            self.newFile.append('%f %f %f %f %f'%(start[0],start[1],end[0],end[1],line.ViewObject.Material))
+#        
+#                
+#    def __addPoints(self , points):
+#        '''
+#        add points to self.newFile
+#        '''
+#        for p in points:
+#            self.newFile.append('%f %f'%(p[0],p[1]))
+#            
+#    def reset(self):
+#        self.materialLines = []
+#            
+#    def collectShapes(self):
+#        self.reset()
+#        doc = FreeCAD.ActiveDocument   #  获取当前活动视图
+#        objs = doc.Objects             #  获取当前对象列表，有时效性，如获得后列表更新，这个已获得不会改变
+#        for obj in objs :
+#            self.storeShape(obj)
+#            
+#    def write2File(self):
+##        paraFile = open(Base.__workbenchPath__+'/dc_Ff.c', 'wb')
+###        paraFile.write(Base.__currentProjectPath__+'/tmpData.dc')
+##        paraFile.write(Base.__currentProjectPath__+'/data.dc')
+##        paraFile.close()
+#
+##        outfile = open(Base.__currentProjectPath__+'/tmpData.dc', 'wb')
+#        outfile = open(Base.__currentProjectPath__+'/data.dc', 'wb')
+#        outfile.write('\n'.join(self.newFile))
+#        outfile.close()
         
 
 class DCInputChangesConfirm(BaseStore):
@@ -479,7 +479,7 @@ class DCInputChangesConfirm(BaseStore):
         for line in df_inputDatabase.boltElements:
             if line.visible:
                 self.newFile.append('%f %f %f %f %f %f %f'%(line.startPoint[0],line.startPoint[1]\
-                                ,line.endPoint[0],line.endPoint[1],line.e0 , line.t0 , line.f0))
+                                ,line.endPoint[0],line.endPoint[1],line.e , line.t , line.f))
         
         
     def __addPoints(self , points):
@@ -580,96 +580,96 @@ class DCInputDataStore(BaseStore):
         outfile.close()
         
  
-class DFInputGraphDataStore(BaseStore):
-    '''
-    this class is used to add material lines, four kinds of points in DC process
-    '''
-    def __init__(self):
-        self.reset()
-        
-    def GetResources(self):
-        return {
-                'MenuText':  'DF_Store',
-                'ToolTip': "store data for dc."}   
-             
-    def reset(self):
-        self.database = None
-        self.content = ''
-    
-    def getPandect(self):
-        from DDADatabase import df_inputDatabase
-        blocksNum = 0
-        boltsNum = 0
-        
-        jointsNum = 0
-        for block in  df_inputDatabase.blocks:
-            if block.visible():
-                blocksNum += 1
-                jointsNum += len(block.vertices)
-        jointsNum += blocksNum*4  # parameters for block
-        
-        fps = len([p for p in df_inputDatabase.fixedPoints if p.visible])
-        lps = len([p for p in df_inputDatabase.loadingPoints if p.visible])
-        mps = len([p for p in df_inputDatabase.measuredPoints if p.visible])
-        
-        return '%d %d %d\n%d %d %d\n'%(blocksNum , boltsNum , jointsNum\
-                                         , fps , lps , mps)
-        
-    def getBlocksSchema(self):
-        from DDADatabase import df_inputDatabase
-        tmpContent = []
-        jointsCount = 1
-        for block in df_inputDatabase.blocks:
-            if block.visible():
-                tmpContent.append('%d %d %d'%(block.materialNo , jointsCount \
-                                , jointsCount+len(block.vertices)-1))
-                jointsCount = jointsCount+len(block.vertices)+4
-        return ('\n'.join(tmpContent))+'\n'
-    
-    def getJoints(self):
-        from DDADatabase import df_inputDatabase
-        tmpContent = []
-        for block in df_inputDatabase.blocks:
-            if block.visible():
-                tmpContent.extend(['%f %f %f'%(t[0],t[1],t[2]) for t in block.vertices])
-                paras = block.parameters
-                for i in range(4):
-                    tmpContent.append('%f %f %f'%(paras[3*i],paras[3*i+1],paras[3*i+2]))
-        return ('\n'.join(tmpContent))+'\n'
-    
-   
-    def getPoints(self):
-        from DDADatabase import df_inputDatabase
-        tmpContent = []
-        
-        tmpContent.extend(['%f %f %f'%(p.x , p.y , p.blockNo) for p in df_inputDatabase.fixedPoints  if p.visible])
-        tmpContent.extend(['%f %f %f'%(p.x , p.y , p.blockNo) for p in df_inputDatabase.loadingPoints  if p.visible])
-        tmpContent.extend(['%f %f %f'%(p.x , p.y , p.blockNo) for p in df_inputDatabase.measuredPoints if p.visible])
-
-        return ('\n'.join(tmpContent)) +'\n'
-    
-    def storeScene(self):
-        '''
-        organize content that will be writen into file.
-        self.oldFile is original file
-        self.newFile is the new file
-        '''
-        print 'start to store DC information'
-        self.content = self.getPandect() + self.getBlocksSchema() \
-                        + self.getJoints() + self.getPoints()
-        self.write2File()
-        self.content = ''
-        print 'DC information store done'
-        
-    def write2File(self):
-        outfile = open(Base.__currentProjectPath__+'/data.df', 'wb')
-        outfile.write(self.content)
-        outfile.close()
+#class DFInputGraphDataStore(BaseStore):
+#    '''
+#    this class is used to add material lines, four kinds of points in DC process
+#    '''
+#    def __init__(self):
+#        self.reset()
+#        
+#    def GetResources(self):
+#        return {
+#                'MenuText':  'DF_Store',
+#                'ToolTip': "store data for dc."}   
+#             
+#    def reset(self):
+#        self.database = None
+#        self.content = ''
+#    
+#    def getPandect(self):
+#        from DDADatabase import df_inputDatabase
+#        blocksNum = 0
+#        boltsNum = len(df_inputDatabase.boltElements)
+#        
+#        jointsNum = 0
+#        for block in  df_inputDatabase.blocks:
+#            if block.visible():
+#                blocksNum += 1
+#                jointsNum += len(block.vertices)
+#        jointsNum += blocksNum*4  # parameters for block
+#        
+#        fps = len([p for p in df_inputDatabase.fixedPoints if p.visible])
+#        lps = len([p for p in df_inputDatabase.loadingPoints if p.visible])
+#        mps = len([p for p in df_inputDatabase.measuredPoints if p.visible])
+#        
+#        return '%d %d %d\n%d %d %d\n'%(blocksNum , boltsNum , jointsNum\
+#                                         , fps , lps , mps)
+#        
+#    def getBlocksSchema(self):
+#        from DDADatabase import df_inputDatabase
+#        tmpContent = []
+#        jointsCount = 1
+#        for block in df_inputDatabase.blocks:
+#            if block.visible():
+#                tmpContent.append('%d %d %d'%(block.materialNo , jointsCount \
+#                                , jointsCount+len(block.vertices)-1))
+#                jointsCount = jointsCount+len(block.vertices)+4
+#        return ('\n'.join(tmpContent))+'\n'
+#    
+#    def getJoints(self):
+#        from DDADatabase import df_inputDatabase
+#        tmpContent = []
+#        for block in df_inputDatabase.blocks:
+#            if block.visible():
+#                tmpContent.extend(['%f %f %f'%(t[0],t[1],t[2]) for t in block.vertices])
+#                paras = block.parameters
+#                for i in range(4):
+#                    tmpContent.append('%f %f %f'%(paras[3*i],paras[3*i+1],paras[3*i+2]))
+#        return ('\n'.join(tmpContent))+'\n'
+#    
+#   
+#    def getPoints(self):
+#        from DDADatabase import df_inputDatabase
+#        tmpContent = []
+#        
+#        tmpContent.extend(['%f %f %f'%(p.x , p.y , p.blockNo) for p in df_inputDatabase.fixedPoints  if p.visible])
+#        tmpContent.extend(['%f %f %f'%(p.x , p.y , p.blockNo) for p in df_inputDatabase.loadingPoints  if p.visible])
+#        tmpContent.extend(['%f %f %f'%(p.x , p.y , p.blockNo) for p in df_inputDatabase.measuredPoints if p.visible])
+#
+#        return ('\n'.join(tmpContent)) +'\n'
+#    
+#    def storeScene(self):
+#        '''
+#        organize content that will be writen into file.
+#        self.oldFile is original file
+#        self.newFile is the new file
+#        '''
+#        print 'start to store DC information'
+#        self.content = self.getPandect() + self.getBlocksSchema() \
+#                        + self.getJoints() + self.getPoints()
+#        self.write2File()
+#        self.content = ''
+#        print 'DC information store done'
+#        
+#    def write2File(self):
+#        outfile = open(Base.__currentProjectPath__+'/data.df', 'wb')
+#        outfile.write(self.content)
+#        outfile.close()
 
 
 DLStoreData = DLInformationStore()
 FreeCADGui.addCommand('DDA_StoreData', DLStoreData)
-FreeCADGui.addCommand('DDA_JointLineChangesConfirm', JointLineChangesConfirm())
+#FreeCADGui.addCommand('DDA_JointLineChangesConfirm', JointLineChangesConfirm())
 FreeCADGui.addCommand('DDA_DCInputChangesConfirm', DCInputChangesConfirm())
 FreeCADGui.addCommand('DDA_DCInputDataStore', DCInputDataStore())
-FreeCADGui.addCommand('DDA_DFInputGraphDataStore', DFInputGraphDataStore())
+#FreeCADGui.addCommand('DDA_DFInputGraphDataStore', DFInputGraphDataStore())
