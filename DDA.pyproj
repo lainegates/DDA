@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>06a23157-bf56-4a8b-8d7b-43b85205ba67</ProjectGuid>
+    <ProjectHome>.</ProjectHome>
+    <StartupFile>
+    </StartupFile>
+    <SearchPath>
+    </SearchPath>
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <Name>DDA</Name>
+    <RootNamespace>DDA</RootNamespace>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Base.py" />
+    <Compile Include="checkConcave_and_triangulate.py" />
+    <Compile Include="DDADatabase.py" />
+    <Compile Include="DDADisplay.py" />
+    <Compile Include="DDAPanel.py" />
+    <Compile Include="DDAShapes.py" />
+    <Compile Include="DDAToolbars.py" />
+    <Compile Include="DDATools.py" />
+    <Compile Include="DDA_rc.py" />
+    <Compile Include="DFCalculation.py" />
+    <Compile Include="DGPlayer.py" />
+    <Compile Include="drawGui.py" />
+    <Compile Include="fcgeo.py" />
+    <Compile Include="fcvec.py" />
+    <Compile Include="Graph.py" />
+    <Compile Include="InitGui.py" />
+    <Compile Include="interfaceTools.py" />
+    <Compile Include="loadDataTools.py" />
+    <Compile Include="storeScene.py" />
+    <Compile Include="testInterfaceTools.py" />
+    <Compile Include="test_rc.py" />
+    <Compile Include="TrackerTools.py" />
+    <Compile Include="ui_BoltParasManually.py" />
+    <Compile Include="ui_BoltsParameters.py" />
+    <Compile Include="ui_DC.py" />
+    <Compile Include="ui_DF.py" />
+    <Compile Include="ui_DFCalcProcess.py" />
+    <Compile Include="ui_DL.py" />
+    <Compile Include="ui_tunnelBolts.py" />
+    <Compile Include="ui_TunnelSelection.py" />
+    <Compile Include="WorkingPlane1.py" />
+    <Compile Include="__init__.py" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
+</Project>

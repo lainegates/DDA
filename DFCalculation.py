@@ -82,7 +82,12 @@ class Ui_DFMatParaConfigPanel(QtGui.QWidget):
         check if 3 tables's data is valid
         '''
         return self.dataTableBLocksMats.checkTable() and self.dataTableJointsMats.checkTable() \
-            and self.dataTableLoadingPointsMats.checkTable()
+            and self.dataTableLoadingPointsMats.checkTable()   \
+            and len(self.dataTableBLocksMats.table.item(0,0).text())>0  \
+            and len(self.dataTableJointsMats.table.item(0,0).text())>0  \
+            and (self.tableLoadingPointsMats.rowCount()==0 \
+                 or  (self.tableLoadingPointsMats.rowCount()>0  \
+                      and len(self.dataTableLoadingPointsMats.table.item(0,0).text())>0))
         
     def __initUI(self):
         from DDADatabase import df_inputDatabase
@@ -384,9 +389,9 @@ class DFCalculation:
         os.chdir(originPath)        
         
     def GetResources(self):
-        return {
-                'MenuText':  'DFCalculation',
-                'ToolTip': "DF calculation process."}
+        return {'Pixmap'  :'DF',
+                'MenuText':  QtCore.QT_TRANSLATE_NOOP('DFCalculation','DFCalculation'),
+                'ToolTip': QtCore.QT_TRANSLATE_NOOP('DFCalculation',"DF calculation process.")}
                 
     def Activated(self, name="None"):
         FreeCAD.Console.PrintMessage( 'Creator activing\n')

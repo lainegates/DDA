@@ -51,6 +51,13 @@ class DDA (Workbench):
 
 #        import FreeCAD , FreeCADGui
 
+        import DDA_rc
+        import FreeCADGui
+
+        FreeCADGui.addLanguagePath(":/translations")
+        FreeCADGui.addIconPath(":/icons")
+
+
 #            try:
         import DDAShapes
 #            except:
@@ -66,18 +73,14 @@ class DDA (Workbench):
         import interfaceTools
         import storeScene
         import loadDataTools
-        import test_rc
-
-#        FreeCADGui.addIconPath(":/icons")
 #        FreeCADGui.addPreferencePage(":/DDA-preferences.ui","DDA")
 #        FreeCADGui.addPreferencePage(":/userprefs-base.ui","DDA")
 #        FreeCAD.Console.PrintMessage('Loading DDA GUI...\n')
         
         import DDAGui
-        list = ['DDA_ChooseProjectPath' , 'DDA_SetPanelSize' , 'DDA_DL' , 'DDA_DC','DFCalculation','PlayDF','DDA_ResetCamera']
-#        list = ['DDA_ChooseProjectPath' ]
+        list = ['DDA_ChooseProjectPath' , 'DDA_SetPanelSize' , 'DDA_DL' , 'DDA_DC','DFCalculation','PlayDF']
         self.appendToolbar('DDACmds' , list)
-        self.appendMenu("My Command",list)
+#        self.appendMenu("My Command",list)
         
     def resetCamera(self):
         import FreeCADGui

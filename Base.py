@@ -31,7 +31,7 @@ import fcvec, fcgeo
 from pivy import coin
 from PyQt4 import QtGui , QtCore
 import PartGui
-
+import silver_rc
 
 #---------------------------------------------------------------------------
 # General functions
@@ -65,6 +65,15 @@ __penColors__ = [( 0.0 , 0.0 , 0.0 , 1.0 ) ,( 0.0 , 0.0 , 0.0 , 1.0 ) ,( 0.0 , 1
 
 __shapeBeModifying__ = [None , None , None] # docName , objName , subElement
 __clearShapeModifyingNodes__ = False
+
+
+FreeCADGui.updateLocale()
+def translate(context, text):
+    "convenience function for Qt translator"
+    return str(QtGui.QApplication.translate(context, text, None, QtGui.QApplication.UnicodeUTF8).toUtf8())
+def _translate(context, text):
+    '''翻译QString时用，指定字符串的解码方式，不然显示中文会有乱码 Silver'''
+    return str(QtGui.QApplication.translate(context, text, None, QtGui.QApplication.UnicodeUTF8).toUtf8()).decode('UTF-8')
 
 def ifGraphLatest():
     return __ifGraphLatest__

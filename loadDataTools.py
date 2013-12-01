@@ -201,6 +201,7 @@ class ParseAndLoadDLData(BaseParseData):
         
     def GetResources(self):
         return {
+                'Pixmap'  : 'LoadDLInput',
                 'MenuText':  'LoadDCInputData',
                 'ToolTip': "Load DC Input Data"}
         
@@ -699,6 +700,7 @@ class ParseDFInputGraphData(BaseParseData):
 
     def GetResources(self):
         return {
+                'Pixmap'  : 'LoadDFInput',
                 'MenuText':  'LoadDFInputData',
                 'ToolTip': "Load DF Input Data"}
         
@@ -902,6 +904,7 @@ class ParseAndLoadDCInputData(BaseParseData):
         
     def GetResources(self):
         return {
+                'Pixmap'  : 'LoadDCInput',
                 'MenuText':  'LoadDCInputData',
                 'ToolTip': "Load DC Input Data"}
         

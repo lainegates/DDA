@@ -262,9 +262,9 @@ class DisplayDLInputData:
     load dc input data , and show it.
     '''
     def GetResources(self):
-        return {
-                'MenuText':  'DisplayDCInputData',
-                'ToolTip': "Display DC Input Data"}   
+        return {'Pixmap'  :'LoadDLInput',
+                'MenuText':  QtCore.QT_TRANSLATE_NOOP('DDA_ShowDLInputGraph','DisplayDLInputData'),
+                'ToolTip': QtCore.QT_TRANSLATE_NOOP('DDA_ShowDLInputGraph',"Display DL Input Data")}   
          
     def Activated(self):
         from Base import __currentProjectPath__

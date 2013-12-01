@@ -25,14 +25,14 @@
 import os
 import time
 import FreeCADGui
+from PyQt4 import QtCore
 
 class DGPlayer:
     def GetResources(self):
-        return {
-#                'Pixmap'  : 'Test1',
-                'MenuText':  'PlayDF',
-                'ToolTip': "play animation of DF ."
-        }
+        return {'Pixmap'  : 'DG',
+                'MenuText': QtCore.QT_TRANSLATE_NOOP('PlayDF','DG'),
+                'ToolTip': QtCore.QT_TRANSLATE_NOOP('PlayDF',"DDA post process")}
+
                 
     def Activated(self, name="None"):
         path = os.getcwd()

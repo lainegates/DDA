@@ -22,7 +22,10 @@
 #*   USA                                                                   *
 #*                                                                         *
 #***************************************************************************
-
+#****************************************
+#Modified by Silver <bumingqiu@gmail.com>
+#2013-11-27
+#****************************************
 
 import FreeCAD , FreeCADGui
 from pivy import coin
@@ -30,7 +33,7 @@ from PyQt4 import QtCore , QtGui
 from ui_DC import *
 from ui_DL import *
 from drawGui import getMainWindow
-
+from Base import translate,_translate
 
 __currentDDAPanel__ = None  # which panel is using current time , DL or DC
 #from Base import __currentDDAPanel__
@@ -68,15 +71,15 @@ class DLCMD :
         self.ui.setVisible(False)
         self.mw.addToolBar(QtCore.Qt.TopToolBarArea , self.ui)
         self.ui.setMovable(True)
-        self.act_LoadDLInputData = QtGui.QAction('LoadDLInputData',self.ui)
-        self.act_BoundaryNode = QtGui.QAction('BoundaryNodes' ,self.ui)
-        self.act_Border = QtGui.QAction('GenerateBorder' ,self.ui)
-        self.act_AdditionalLine = QtGui.QAction('AdditionalLine' ,self.ui)
-        self.act_JointSet = QtGui.QAction('JointSet' ,self.ui)
-        self.act_Tunnel = QtGui.QAction('Tunnel',self.ui)
-        self.act_Calculate = QtGui.QAction('Calculate',self.ui)
-        self.act_Confirm = QtGui.QAction('Confirm',self.ui)
-        self.act_LoadDCInputData = QtGui.QAction('LoadDCInputData',self.ui)
+        self.act_LoadDLInputData = QtGui.QAction(QtGui.QIcon(':/icons/LoadDLInput'),QtGui.QApplication.translate('DDA_DL','LoadDLInputData'),self.ui)
+        self.act_BoundaryNode = QtGui.QAction(QtGui.QIcon(':/icons/BoundaryNodes'),QtGui.QApplication.translate('DDA_DL','BoundaryNodes') ,self.ui)
+        self.act_Border = QtGui.QAction(QtGui.QIcon(':/icons/Border'),QtGui.QApplication.translate('DDA_DL','GenerateBorder') ,self.ui)
+        self.act_AdditionalLine = QtGui.QAction(QtGui.QIcon(':/icons/additionalLines'),QtGui.QApplication.translate('DDA_DL','AdditionalLine') ,self.ui)
+        self.act_JointSet = QtGui.QAction(QtGui.QIcon(':/icons/JointSet'),QtGui.QApplication.translate('DDA_DL','JointSet') ,self.ui)
+        self.act_Tunnel = QtGui.QAction(QtGui.QIcon(':/icons/Tunnel'),QtGui.QApplication.translate('DDA_DL','Tunnel'),self.ui)
+        self.act_Calculate = QtGui.QAction(QtGui.QIcon(':/icons/Calculate'),QtGui.QApplication.translate('DDA_DL','Calculate'),self.ui)
+        self.act_Confirm = QtGui.QAction(QtGui.QIcon(':/icons/Save'),QtGui.QApplication.translate('DDA_DL','Confirm'),self.ui)
+        self.act_LoadDCInputData = QtGui.QAction(QtGui.QIcon(':/icons/LoadDCInput'),QtGui.QApplication.translate('DDA_DL','LoadDCInputData'),self.ui)
         self.ui.addAction(self.act_LoadDLInputData)
         self.ui.addAction(self.act_Border)
         self.ui.addAction(self.act_BoundaryNode)
@@ -170,9 +173,9 @@ class DLCMD :
         FreeCADGui.runCommand('DDA_DCInputDataStore')
             
     def GetResources(self):
-        return {
-                'MenuText':  'DLPanel',
-                'ToolTip': "call DL panel out"}
+        return {'Pixmap'  :'DL',
+                'MenuText':  QtCore.QT_TRANSLATE_NOOP('DDA_DL','DLPanel'),
+                'ToolTip': QtCore.QT_TRANSLATE_NOOP('DDA_DL','call DL panel out')}
         
     def Activated(self, name="None"):
         FreeCAD.Console.PrintMessage( 'Creator activing\n')
@@ -248,16 +251,16 @@ class DCCMD :
         self.ui.setVisible(False)
         self.mw.addToolBar(QtCore.Qt.TopToolBarArea , self.ui)
         self.ui.setMovable(True)
-        self.act_FixedPoint = QtGui.QAction('FixedPoint' ,self.ui)
-        self.act_LoadingPoint = QtGui.QAction('LoadingPoint',self.ui)
-        self.act_MeasuredPoint = QtGui.QAction('MeasuredPoint' ,self.ui)
-        self.act_HolePoint = QtGui.QAction('HolePoint' ,self.ui)
-        self.act_MaterialLine = QtGui.QAction('MaterialLine' ,self.ui)        
+        self.act_FixedPoint = QtGui.QAction(QtGui.QIcon(':/icons/FixedPoint'),QtGui.QApplication.translate('DDA_DC','FixedPoint') ,self.ui)
+        self.act_LoadingPoint = QtGui.QAction(QtGui.QIcon(':/icons/LoadingPont'),QtGui.QApplication.translate('DDA_DC','LoadingPoint'),self.ui)
+        self.act_MeasuredPoint = QtGui.QAction(QtGui.QIcon(':/icons/MeasuredPoint'),QtGui.QApplication.translate('DDA_DC','MeasuredPoint') ,self.ui)
+        self.act_HolePoint = QtGui.QAction(QtGui.QIcon(':/icons/HolePoint'),QtGui.QApplication.translate('DDA_DC','HolePoint' ),self.ui)
+        self.act_MaterialLine = QtGui.QAction(QtGui.QIcon(':/icons/MaterialLine'),QtGui.QApplication.translate('DDA_DC','MaterialLine' ),self.ui)        
 #        self.act_Preview = QtGui.QAction('Preview',self.ui)
-        self.act_Calculate = QtGui.QAction('Calculate',self.ui)
-        self.act_Confirm = QtGui.QAction('Confirm',self.ui)
-        self.act_LoadData = QtGui.QAction('LoadDFInputData',self.ui)
-        self.act_GenerateBolts = QtGui.QAction('GenerateTunnelBolts',self.ui)
+        self.act_Calculate = QtGui.QAction(QtGui.QIcon(':/icons/Calculate'),QtGui.QApplication.translate('DDA_DC','Calculate'),self.ui)
+        self.act_Confirm = QtGui.QAction(QtGui.QIcon(':/icons/Save'),QtGui.QApplication.translate('DDA_DC','Confirm'),self.ui)
+        self.act_LoadData = QtGui.QAction(QtGui.QIcon(':/icons/LoadDFInput'),QtGui.QApplication.translate('DDA_DC','LoadDFInputData'),self.ui)
+        self.act_GenerateBolts = QtGui.QAction(QtGui.QIcon(':/icons/boltsGenerator'),QtGui.QApplication.translate('DDA_DC','GenerateTunnelBolts'),self.ui)
         self.ui.addAction(self.act_FixedPoint)
         self.ui.addAction(self.act_LoadingPoint)
         self.ui.addAction(self.act_MeasuredPoint)
@@ -343,9 +346,9 @@ class DCCMD :
         FreeCADGui.runCommand('DDA_DisplayDFInputGraph')
         
     def GetResources(self):
-        return {
-                'MenuText':  'DCPanel',
-                'ToolTip': "call DC panel out"}
+        return {'Pixmap'  :'DC',
+                'MenuText':  QtCore.QT_TRANSLATE_NOOP('DDA_DC','DCPanel'),
+                'ToolTip': QtCore.QT_TRANSLATE_NOOP('DDA_DC','call DC panel out')}
         
     def Activated(self, name="None"):
         FreeCAD.Console.PrintMessage( 'Creator activing\n')
@@ -367,7 +370,7 @@ class DCCMD :
         self.featureName = name
         
         if not self.doc:
-            FreeCAD.Console.PrintMessage( 'FreeCAD.ActiveDocument get failed\n')
+            FreeCAD.Console.PrintMessage( Base.translate('DDA_DC','FreeCAD.ActiveDocument get failed\n'))
             self.finish()
         else:
             FreeCAD.activeDDACommand = self  # FreeCAD.activeDDACommand 在不同的时间会接收不同的命令 

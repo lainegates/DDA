@@ -54,7 +54,7 @@ class BoundaryLines( Line ):
         
         
     def GetResources(self):
-        return {
+        return {'Pixmap'  : 'BoundaryNodes',
                 'MenuText':  'BoundaryLine',
                 'ToolTip': "Creates Boundary Line of DL."}
         
@@ -67,9 +67,9 @@ class BoundaryLines( Line ):
 
 class BorderGenerator:
     def GetResources(self):
-        return {
-                'MenuText':  'GenerateBorder',
-                'ToolTip': "generate border for current boundary."}
+        return {'Pixmap'  :'Border',
+                'MenuText':  QtCore.QT_TRANSLATE_NOOP('DDA_GenerateBorder','GenerateBorder'),
+                'ToolTip': QtCore.QT_TRANSLATE_NOOP('DDA_GenerateBorder',"generate border for current boundary.")}
     
     def drawFixedPoints(self , pts):
         '''
@@ -163,12 +163,7 @@ class TunnelBoltsGenerator:
             calculator.calculateBolts4Tunnel(dl_database.tunnels[idx])
             calculator.exec_()
         
-        
-#        
-#        boltsDialog = TunnelBoltsSelectionTool()
-#        boltsDialog.configure(idx)
-#        print 'abc'
-        
+       
     def finish(self):
         pass
     
@@ -245,9 +240,9 @@ class AdditionalLines( Line ):
         
         
     def GetResources(self):
-        return {
-                'MenuText':  'AdditionalLine',
-                'ToolTip': "Creates Additional Line of DL."}
+        return {'Pixmap'  :'additionalLines',
+                'MenuText':  QtCore.QT_TRANSLATE_NOOP('DDA_AdditionalLine','AdditionalLine'),
+                'ToolTip': QtCore.QT_TRANSLATE_NOOP('DDA_AdditionalLine','Creates Additional Line of DL.')}
                 
     def Activated(self):
         Line.Activated(self)
@@ -266,7 +261,7 @@ class AdditionalLines( Line ):
         layout2.addWidget(self.spinbox)
         layout2.addWidget(button)        
         label = QtGui.QLabel(self.dialog)
-        label.setText('select material Number :')
+        label.setText(QtGui.QApplication.translate('DDA_AdditionalLine','select material Number :'))
         layout.addWidget(label )
         layout.addLayout(layout2 )
         self.dialog.setLayout(layout)
@@ -383,9 +378,11 @@ class JointSets(Creator):
         
     def __initWidgets(self):
         self.strList = QtCore.QStringList()
-        self.strList<<QtCore.QString('dip')<<QtCore.QString('dip direction')<<QtCore.QString('')
+        self.strList<<QtCore.QString(QtGui.QApplication.translate('DDA_JointSet','dip')) \
+            <<QtCore.QString(QtGui.QApplication.translate('DDA_JointSet','dip direction')) \
+            <<QtCore.QString('')
     
-        self.label1 = QtGui.QLabel('Slope')
+        self.label1 = QtGui.QLabel(QtGui.QApplication.translate('DDA_JointSet','Slope'))
         self.slopeDataTable = DataTable(1,2,self.strList , False , False)
         self.table1 = self.slopeDataTable.table
         self.table1.setColumnWidth(2 , 50)
@@ -397,8 +394,14 @@ class JointSets(Creator):
         self.__table1Valid = False
         
         self.strList2 = QtCore.QStringList()
-        self.strList2<<QtCore.QString('dip')<<QtCore.QString('dip direction')<<QtCore.QString('spacing')<<QtCore.QString('length')<<QtCore.QString('bridge')<<QtCore.QString('random')<<QtCore.QString('')
-        self.label2 = QtGui.QLabel('JointSet')
+        self.strList2<<QtCore.QString(QtGui.QApplication.translate('DDA_JointSet','dip')) \
+            <<QtCore.QString(QtGui.QApplication.translate('DDA_JointSet','dip direction')) \
+            <<QtCore.QString(QtGui.QApplication.translate('DDA_JointSet','spacing')) \
+            <<QtCore.QString(QtGui.QApplication.translate('DDA_JointSet','length')) \
+            <<QtCore.QString(QtGui.QApplication.translate('DDA_JointSet','bridge')) \
+            <<QtCore.QString(QtGui.QApplication.translate('DDA_JointSet','random')) \
+            <<QtCore.QString('')
+        self.label2 = QtGui.QLabel(QtGui.QApplication.translate('DDA_JointSet','JointSet'))
         self.dataTable = DataTable(1 , self.__columnNum ,self.strList2)
         self.table2 = self.dataTable.table
         self.table2.setColumnWidth(6 , 50)
@@ -410,8 +413,8 @@ class JointSets(Creator):
         self.layout2.addWidget(self.table2)
         
         self.layout3 = QtGui.QHBoxLayout()
-        self.addButton = QtGui.QPushButton('Add JointSet')
-        self.viewButton = QtGui.QPushButton('ViewResult')
+        self.addButton = QtGui.QPushButton(QtGui.QApplication.translate('DDA_JointSet','Add JointSet'))
+        self.viewButton = QtGui.QPushButton(QtGui.QApplication.translate('DDA_JointSet','ViewResult'))
         self.viewButton.setEnabled(False)
         self.layout3.addWidget(self.addButton)
         self.layout3.addWidget(self.viewButton)
@@ -492,7 +495,7 @@ class JointSets(Creator):
 #        FreeCADGui.DDADisplayCmd.preview()
 
         import Base
-        re = Base.showWaringMessageBox('Warning', 'Joint lines will calculated again. All changes made manually will be lost, are your sure?')
+        re = Base.showWaringMessageBox('Warning', QtGui.QApplication.translate('DDA_JointSet','Joint lines will calculated again. All changes made manually will be lost, are your sure?'))
 
         if re== QtGui.QMessageBox.Ok:
             FreeCADGui.runCommand('DDA_DLCalculate')
@@ -508,7 +511,7 @@ class JointSets(Creator):
         self.mainWidget.show()
         
     def GetResources(self):
-        return {
+        return {'Pixmap'  :'JointSet',
                 'MenuText':  'JointSet',
                 'ToolTip': "manage joint sets of DL."}
                 
@@ -530,8 +533,8 @@ class Tunnels(Creator):
         self.__initConnections()
         
     def __initWidgets(self):
-        self.headers = ['Type' , 'a' , 'b' , 'c' , 'r' , 'centerX' , 'centerY','']
-        self.label = QtGui.QLabel('Tunnel')
+        self.headers = [QtGui.QApplication.translate('DDA_Tunnel','Type') , 'a' , 'b' , 'c' , 'r' , QtGui.QApplication.translate('DDA_Tunnel','centerX') , QtGui.QApplication.translate('DDA_Tunnel','centerY'),'']
+        self.label = QtGui.QLabel(QtGui.QApplication.translate('DDA_Tunnel','Tunnel'))
         self.dataTable = DataTable(1 , self.__columnNum , self.headers , True)
         self.table = self.dataTable.table
 #        self.table.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)  #一次只能选单个目标
@@ -540,8 +543,8 @@ class Tunnels(Creator):
         self.table.setFixedSize(740,130)        
 
         self.layout2 = QtGui.QHBoxLayout()
-        self.addButton = QtGui.QPushButton('Add Tunnel')
-        self.previewButton = QtGui.QPushButton('ViewResult')
+        self.addButton = QtGui.QPushButton(QtGui.QApplication.translate('DDA_Tunnel','Add Tunnel'))
+        self.previewButton = QtGui.QPushButton(QtGui.QApplication.translate('DDA_Tunnel','ViewResult'))
         self.previewButton.setEnabled(False)
         self.layout2.addWidget(self.addButton)
         self.layout2.addWidget(self.previewButton)
@@ -572,7 +575,7 @@ class Tunnels(Creator):
         print '#############################\n############  preview##########\n#####################\n'
         
         import Base
-        re = Base.showWaringMessageBox('Warning', 'Joint lines will calculated again. All changes made manually will be lost, are your sure?')
+        re = Base.showWaringMessageBox('Warning', QtGui.QApplication.translate('DDA_Tunnel','Joint lines will calculated again. All changes made manually will be lost, are your sure?'))
 
         if re== QtGui.QMessageBox.Ok:
             FreeCADGui.runCommand('DDA_DLCalculate')

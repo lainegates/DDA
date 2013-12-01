@@ -22,7 +22,10 @@
 #*   USA                                                                   *
 #*                                                                         *
 #***************************************************************************
-
+#****************************************
+#Modified by Silver <bumingqiu@gmail.com>
+#2013-11-27
+#****************************************
 
 import FreeCAD
 
@@ -533,7 +536,7 @@ class Line(Creator):
             #Draft.formatObject(self.obj)
             #if not Draft.getParam("UiMode"): self.makeDumbTask()
             self.call = self.view.addEventCallback("SoEvent", self.action)
-            msg( "Pick first point:\n")
+            msg( translate('line',"Pick first point:\n"))
             
 #            import DDAToolbars
 #            FreeCADGui.DDAToolBar = DDAToolbars.lineToolbar
@@ -781,7 +784,7 @@ class Circle(Creator):
             self.center = None
             self.rad = None
             self.call = self.view.addEventCallback("SoEvent", self.action)
-            msg("Pick center point:\n")
+            msg(QtGui.QApplication.translate('Circle',"Pick center point:\n"))
 
     def finish(self, closed=True, cont=False):
         "finishes the arc"
@@ -1069,8 +1072,7 @@ class DataTable(QtCore.QObject):
 
 class TunnelSelectionTool(QtGui.QDialog):
     '''
-    This class is a tools to help users to choose the tunnel they want to generate bolts for
-    The tunnel parameters from 'data.dl'
+    tools to choose tunnel
     '''
     def __init__(self,parent=None):
         QtGui.QDialog.__init__(self,parent)
@@ -1100,7 +1102,6 @@ class TunnelSelectionTool(QtGui.QDialog):
                 , 'No tunnel data found in file \"%s/data.dl\".'%Base.__currentProjectPath__ )
             return
 
-
         table = self.ui.tableWidget
         table.setRowCount(len(tunnels))
         for i , t in enumerate(tunnels):
@@ -1112,6 +1113,7 @@ class TunnelSelectionTool(QtGui.QDialog):
         flag = self.exec_()
         if QtGui.QDialog.Accepted==flag:
             return table.currentRow()
+        return None
         
     def getSelectedTunnelNo(self):
         if self.ui.tableWidget.rowCount()>0:
@@ -1175,21 +1177,8 @@ class CalculateTunnelBoltsWithParameters(QtGui.QDialog):
                                , args=DDADatabase.tmpBoltElements)
         QtGui.QDialog.accept(self)
 
-#    def done(self , r):
-#        print '''************************************\n
-#                ************************************\n
-#                ************************************\n
-#                ************************************\n
-#                ************************************\n'''
-#        QtGui.QDialog.done(self , r)
-#        import DDADatabase , Part
-#        DDADatabase.tmpBoltElements = []
-#        FreeCAD.ActiveDocument.getObject('TmpBoltElement').Shape=Part.Shape()
 
 class TunnelBoltsSelectionTool(QtGui.QDialog):
-    '''
-    This class is designed to help users to select the bolts they want on the screen
-    '''
     def __init__(self,parent=None):
         QtGui.QDialog.__init__(self,parent)
         self.initUI()
@@ -1216,9 +1205,9 @@ class TunnelBoltsSelectionTool(QtGui.QDialog):
         print 'generate bolt elements for Tunnel (%f ,  %f , %f , %f , %f ,%f , %f)' \
                 %( a , b , c , centerX , centerY , length , length2 )
         
-        from interfaceTools import TunnelBoltsGenerator
+        from interfaceTools import Tunnel2BoltsGenerator
         
-        self.bolts = TunnelBoltsGenerator.generateBolts( centerX=centerX , centerY=centerY \
+        self.bolts = Tunnel2BoltsGenerator.generateBolts( centerX=centerX , centerY=centerY \
             , halfWidth=a , halfHeight=b , arcRadius=c \
             , boltsDistance=1 , boltLength=length , boltLength2=length2)
         
@@ -1301,9 +1290,9 @@ class ChooseProjectPath:
     choose workbench for DDA
     '''
     def GetResources(self):
-        return {
-                'MenuText': "Choose Workbench",
-                'ToolTip': "choose"}
+        return {'Pixmap'  :'setProjectPath',
+                'MenuText': QtCore.QT_TRANSLATE_NOOP('DDA_ChooseProjectPath',"Choose Workbench"),
+                'ToolTip': QtCore.QT_TRANSLATE_NOOP('DDA_ChooseProjectPath',"choose project path.")}
 
     def Activated(self):
         if FreeCAD.activeDDACommand:
@@ -1313,8 +1302,9 @@ class ChooseProjectPath:
         dialog.setFileMode(QtGui.QFileDialog.DirectoryOnly)
         dir =  str(dialog.getExistingDirectory())
         if dir:
-            print 'change to new project path : ', dir
             import Base
+            print Base._translate('DDA_ChooseProjectPath','change to new project path : '), 
+            print dir
             Base.__currentProjectPath__ = dir
             import PyDDA
             PyDDA.setCurrentProjectPath(dir)
@@ -1328,18 +1318,18 @@ class SetPanelSize:
         self.initSettingPanel()
     
     def GetResources(self):
-        return {
-                'MenuText': "SetPanelSize",
-                'ToolTip': "Set Panel Size"}
+        return {'Pixmap'  :'setWorkingSection',
+                'MenuText': QtCore.QT_TRANSLATE_NOOP('DDA_SetPanelSize',"SetPanelSize"),
+                'ToolTip': QtCore.QT_TRANSLATE_NOOP('DDA_SetPanelSize',"Set Panel Size")}
         
     def initSettingPanel(self):
         self.mainDialog = QtGui.QWidget()
         layout = QtGui.QGridLayout(self.mainDialog)
         
-        startPointLabel = QtGui.QLabel('please input the left-bottom corner coordinate.')
+        startPointLabel = QtGui.QLabel(QtGui.QApplication.translate('DDA_SetPanelSize','please input the left-bottom corner coordinate.'))
         layout.addWidget(startPointLabel , 0 , 0 , 1 , 4 , QtCore.Qt.AlignLeft)
         
-        xLabel = QtGui.QLabel('X      :')
+        xLabel = QtGui.QLabel(QtGui.QApplication.translate('DDA_SetPanelSize','X      :'))
         layout.addWidget(xLabel , 1 , 0 , QtCore.Qt.AlignLeft)
         self.xValue = QtGui.QDoubleSpinBox()
         self.xValue.setDecimals(2)
@@ -1348,7 +1338,7 @@ class SetPanelSize:
         self.xValue.setValue(50)
         layout.addWidget(self.xValue , 1 , 1 , QtCore.Qt.AlignLeft)
         
-        yLabel = QtGui.QLabel('Y      :')
+        yLabel = QtGui.QLabel(QtGui.QApplication.translate('DDA_SetPanelSize','Y      :'))
         layout.addWidget(yLabel , 1 , 2 , QtCore.Qt.AlignLeft)
         self.yValue = QtGui.QDoubleSpinBox()
         self.yValue.setDecimals(2)
@@ -1357,11 +1347,11 @@ class SetPanelSize:
         self.yValue.setValue(10)
         layout.addWidget(self.yValue , 1 , 3 , QtCore.Qt.AlignLeft)
         
-        sizeLabel = QtGui.QLabel('please input size of work panel.')
+        sizeLabel = QtGui.QLabel(QtGui.QApplication.translate('DDA_SetPanelSize','please input size of work panel.'))
         layout.addWidget(sizeLabel , 2 , 0 , 1 ,4 , QtCore.Qt.AlignLeft)
         
         
-        widthLabel = QtGui.QLabel('Width  :')
+        widthLabel = QtGui.QLabel(QtGui.QApplication.translate('DDA_SetPanelSize','Width  :'))
         layout.addWidget(widthLabel , 3 , 0 , QtCore.Qt.AlignLeft)
         self.widthValue = QtGui.QDoubleSpinBox()
         self.widthValue.setDecimals(2)
@@ -1370,7 +1360,7 @@ class SetPanelSize:
         self.widthValue.setValue(200)
         layout.addWidget(self.widthValue , 3 , 1 , QtCore.Qt.AlignLeft)
         
-        heightLabel = QtGui.QLabel('Hieght :')
+        heightLabel = QtGui.QLabel(QtGui.QApplication.translate('DDA_SetPanelSize','Hieght :'))
         layout.addWidget(heightLabel , 3 , 2 , QtCore.Qt.AlignLeft)
         self.heightValue = QtGui.QDoubleSpinBox()
         self.heightValue.setDecimals(2)
@@ -1379,9 +1369,9 @@ class SetPanelSize:
         self.heightValue.setValue(150)
         layout.addWidget(self.heightValue , 3 , 3 , QtCore.Qt.AlignLeft)
         
-        okBtn = QtGui.QPushButton(text='OK')
+        okBtn = QtGui.QPushButton(text=QtGui.QApplication.translate('DDA_SetPanelSize','OK'))
         layout.addWidget(okBtn , 4 , 2 , QtCore.Qt.AlignLeft)
-        cancelBtn = QtGui.QPushButton(text='Cancel')
+        cancelBtn = QtGui.QPushButton(text=QtGui.QApplication.translate('DDA_SetPanelSize','Cancel'))
         layout.addWidget(cancelBtn , 4 , 3 , QtCore.Qt.AlignLeft)
         
         okBtn.pressed.connect(self.saveResult)
